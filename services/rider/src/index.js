@@ -10,8 +10,7 @@ dotenv.config();
 
 // CRITICAL: Connect DB BEFORE starting consumer (consumer uses Mongoose models)
 await connectDB();
-await connectRabbitMQ();
-await startOrderReadyConsumer();
+await connectRabbitMQ(startOrderReadyConsumer);
 
 const app = express();
 app.use(express.json());

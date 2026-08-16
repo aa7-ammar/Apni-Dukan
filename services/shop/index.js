@@ -39,9 +39,7 @@ app.use("/api/order", orderRouter);
 
 connectDB();
 
-await connectRabbitMQ();
-
-await startPaymentConsumer();
+await connectRabbitMQ(startPaymentConsumer);
 
 app.listen(PORT, () => {
     console.log(`Shop service running on port ${PORT}`);

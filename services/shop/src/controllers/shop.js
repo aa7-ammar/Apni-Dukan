@@ -48,7 +48,8 @@ export const addshop = asyncHandler(async (req,res) => {
 
     const { data: uploadResult } = await axios.post(
         `${process.env.UTILS_SERVICE}/api/upload`,
-        { buffer:fileBuffer.content }
+        { buffer:fileBuffer.content },
+        { headers: { "x-internal-key": process.env.INTERNAL_SERVICE_KEY } }
     );
 
     const newShop = await shopModel.create({
@@ -128,7 +129,8 @@ export const editShop = asyncHandler(async (req, res) => {
         if (fileBuffer?.content) {
             const { data: uploadResult } = await axios.post(
                 `${process.env.UTILS_SERVICE}/api/upload`,
-                { buffer: fileBuffer.content }
+                { buffer: fileBuffer.content },
+                { headers: { "x-internal-key": process.env.INTERNAL_SERVICE_KEY } }
             );
             shop.image = uploadResult.url;
         }

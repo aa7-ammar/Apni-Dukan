@@ -6,6 +6,11 @@ const router = express.Router();
 
 router.post("/upload", async (req, res) => {
     try {
+        // Internal endpoint: only other services may upload, never the public internet
+        if (req.headers["x-internal-key"] !== process.env.INTERNAL_SERVICE_KEY) {
+            return res.status(401).json({ message: "unauthorized" });
+        }
+
         const { buffer } = req.body;
         
         if (!buffer) {

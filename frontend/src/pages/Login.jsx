@@ -5,14 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "../main";
 import { useGoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
-import { BiStore, BiShieldCheck, BiMapPin } from "react-icons/bi";
+import { BiStore, BiCheckShield, BiMapPin } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { useAppData } from "../context/AppContext";
 
 const features = [
   { icon: BiStore, label: "Browse local shops & fresh items" },
   { icon: BiMapPin, label: "Real-time delivery tracking" },
-  { icon: BiShieldCheck, label: "Secure & seamless checkout" },
+  { icon: BiCheckShield, label: "Secure & seamless checkout" },
 ];
 
 const Login = () => {

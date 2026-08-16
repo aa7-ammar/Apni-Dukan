@@ -45,9 +45,9 @@ services:
     envVars:
       - fromGroup: apni-dukan-shared
       - key: UTILS_SERVICE
-        value: https://apni-dukan-utils.onrender.com
+        value: https://apni-dukan-utils-uqg8.onrender.com
       - key: REALTIME_SERVICE
-        value: https://apni-dukan-realtime.onrender.com
+        value: https://apni-dukan-realtime-tun0.onrender.com
 
   - type: web
     name: apni-dukan-realtime
@@ -69,7 +69,7 @@ services:
     envVars:
       - fromGroup: apni-dukan-shared
       - key: SHOP_SERVICE
-        value: https://apni-dukan-shop.onrender.com
+        value: https://apni-dukan-shop-mbw2.onrender.com
       - key: RAZORPAY_KEY_ID
         sync: false
       - key: RAZORPAY_KEY_SECRET
@@ -91,8 +91,8 @@ services:
     envVars:
       - fromGroup: apni-dukan-shared
       - key: SHOP_SERVICE
-        value: https://apni-dukan-shop.onrender.com
+        value: https://apni-dukan-shop-mbw2.onrender.com
       - key: UTILS_SERVICE
-        value: https://apni-dukan-utils.onrender.com
+        value: https://apni-dukan-utils-uqg8.onrender.com
       - key: REALTIME_SERVICE
-        value: https://apni-dukan-realtime.onrender.com
+        value: https://apni-dukan-realtime-tun0.onrender.com

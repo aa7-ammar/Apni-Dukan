@@ -12,6 +12,8 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+app.get("/", (req, res) => res.json({ service: "auth", status: "ok" }))
+
 app.use("/api/auth", authRoute)
 
 const PORT = process.env.PORT || 5000

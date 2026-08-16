@@ -27,6 +27,8 @@ app.use(express.urlencoded({
 
 const PORT = process.env.PORT || 5001;
 
+app.get("/", (req, res) => res.json({ service: "shop", status: "ok" }));
+
 app.use("/api/shop", router);
 
 app.use("/api/item", itemRouter);

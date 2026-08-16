@@ -20,6 +20,8 @@ cloudinary.config({
     api_secret: process.env.CLOUD_SECRET_KEY, // ✅ removed unused destructuring
 });
 
+app.get("/", (req, res) => res.json({ service: "utils", status: "ok" }));
+
 app.use("/api", uploadRoutes);
 app.use("/api/payment", paymentRoutes);
 

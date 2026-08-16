@@ -14,6 +14,7 @@ app.use(express.json());
 const server = http.createServer(app);
 
 initSocket(server);
+app.get("/", (req, res) => res.json({ service: "realtime", status: "ok" }));
 app.use("/api/v1/internal",internalRoute);
 const PORT = process.env.PORT || 5002;
 

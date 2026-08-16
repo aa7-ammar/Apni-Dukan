@@ -13,6 +13,8 @@ app.use(express.json());
 app.use(cors());
 const PORT = process.env.PORT || 5005;
 
+app.get("/", (req, res) => res.json({ service: "rider", status: "ok" }));
+
 app.use("/api", router);
 
 // Bind the port first so the host's health check passes, then connect

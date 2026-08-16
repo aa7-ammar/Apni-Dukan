@@ -1,0 +1,98 @@
+# Render Blueprint — deploys all five Apni Dukan microservices as free web services.
+# Dashboard: New -> Blueprint -> select this repo. Secrets marked `sync: false`
+# are prompted for once at blueprint creation.
+
+envVarGroups:
+  - name: apni-dukan-shared
+    envVars:
+      - key: MONGO_URL
+        sync: false # MongoDB Atlas SRV URI (mongodb+srv://...)
+      - key: RABBITMQ_URL
+        sync: false # CloudAMQP amqps:// URL
+      - key: JWT_SEC
+        generateValue: true
+      - key: INTERNAL_SERVICE_KEY
+        generateValue: true
+      - key: PAYMENT_QUEUE
+        value: payment_queue
+      - key: RIDER_QUEUE
+        value: rider_queue
+      - key: ORDER_READY_QUEUE
+        value: order_ready_queue
+
+services:
+  - type: web
+    name: apni-dukan-auth
+    runtime: node
+    plan: free
+    rootDir: services/auth
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - fromGroup: apni-dukan-shared
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+
+  - type: web
+    name: apni-dukan-shop
+    runtime: node
+    plan: free
+    rootDir: services/shop
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - fromGroup: apni-dukan-shared
+      - key: UTILS_SERVICE
+        value: https://apni-dukan-utils.onrender.com
+      - key: REALTIME_SERVICE
+        value: https://apni-dukan-realtime.onrender.com
+
+  - type: web
+    name: apni-dukan-realtime
+    runtime: node
+    plan: free
+    rootDir: services/realtime
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - fromGroup: apni-dukan-shared
+
+  - type: web
+    name: apni-dukan-utils
+    runtime: node
+    plan: free
+    rootDir: services/utils
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - fromGroup: apni-dukan-shared
+      - key: SHOP_SERVICE
+        value: https://apni-dukan-shop.onrender.com
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: CLOUD_NAME
+        sync: false
+      - key: CLOUD_API_KEY
+        sync: false
+      - key: CLOUD_SECRET_KEY
+        sync: false
+
+  - type: web
+    name: apni-dukan-rider
+    runtime: node
+    plan: free
+    rootDir: services/rider
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - fromGroup: apni-dukan-shared
+      - key: SHOP_SERVICE
+        value: https://apni-dukan-shop.onrender.com
+      - key: UTILS_SERVICE
+        value: https://apni-dukan-utils.onrender.com
+      - key: REALTIME_SERVICE
+        value: https://apni-dukan-realtime.onrender.com

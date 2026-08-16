@@ -37,10 +37,12 @@ app.use("/api/address", addressRouter);
 
 app.use("/api/order", orderRouter);
 
-connectDB();
-
-await connectRabbitMQ(startPaymentConsumer);
-
+// Bind the port first so the host's health check passes, then connect
+// to external services (mongoose buffers queries until connected).
 app.listen(PORT, () => {
     console.log(`Shop service running on port ${PORT}`);
 });
+
+connectDB();
+
+connectRabbitMQ(startPaymentConsumer);

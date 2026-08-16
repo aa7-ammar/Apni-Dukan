@@ -8,10 +8,6 @@ import { startOrderReadyConsumer } from "./config/orderReady.consumer.js";
 
 dotenv.config();
 
-// CRITICAL: Connect DB BEFORE starting consumer (consumer uses Mongoose models)
-await connectDB();
-await connectRabbitMQ(startOrderReadyConsumer);
-
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -19,6 +15,14 @@ const PORT = process.env.PORT || 5005;
 
 app.use("/api", router);
 
+// Bind the port first so the host's health check passes, then connect
+// to external services. DB must be up before the consumer starts
+// (the consumer uses Mongoose models).
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+(async () => {
+    await connectDB();
+    await connectRabbitMQ(startOrderReadyConsumer);
+})();

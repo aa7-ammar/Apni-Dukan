@@ -2,6 +2,20 @@
 
 A full-stack, microservices-based e-commerce platform connecting local shops, customers, and delivery riders — with real-time order tracking, live rider chat, and online payments.
 
+## Live Demo
+
+**🌐 [apni-dukan-dkpb.vercel.app](https://apni-dukan-dkpb.vercel.app)** — frontend on Vercel; backend services on Render free tier:
+
+| Service | URL |
+|---|---|
+| Auth | [apni-dukan-auth-7tab.onrender.com](https://apni-dukan-auth-7tab.onrender.com) |
+| Shop | [apni-dukan-shop-mbw2.onrender.com](https://apni-dukan-shop-mbw2.onrender.com) |
+| Realtime | [apni-dukan-realtime-tun0.onrender.com](https://apni-dukan-realtime-tun0.onrender.com) |
+| Utils (payments) | [apni-dukan-utils-uqg8.onrender.com](https://apni-dukan-utils-uqg8.onrender.com) |
+| Rider | [apni-dukan-rider-gvmn.onrender.com](https://apni-dukan-rider-gvmn.onrender.com) |
+
+> **Note:** free-tier services sleep after 15 minutes of inactivity — the first request may take up to a minute while they wake. Payments run in **Razorpay test mode** (test card `4111 1111 1111 1111`, any future expiry/CVV — no real charges).
+
 ## Tech Stack
 
 **Frontend:** React 19, Vite, Tailwind CSS, Framer Motion, React Router, Leaflet (maps), Socket.IO client, Axios
@@ -205,6 +219,22 @@ cd frontend && npm run dev                  # http://localhost:5173
 - **Event-driven order pipeline** — Razorpay payment verification triggers order creation and rider dispatch through RabbitMQ queues
 - **Live order tracking & rider chat** over Socket.IO, with delivery location on Leaflet maps
 - **CDN-backed images** via Cloudinary, keeping the database lean
+
+## Deployment
+
+The live demo runs entirely on free tiers:
+
+- **Backend — Render Blueprint**: [`render.yaml`](render.yaml) defines all five services (Node runtime, `npm ci` + `npm start`, `rootDir` per service) plus a shared env group. Deploy via *New → Blueprint*; fill in the prompted secrets, then set `MONGO_URL` and `RABBITMQ_URL` on the env group in the dashboard (group-level `sync: false` values aren't prompted). Render injects `PORT` automatically. After the first deploy, align the inter-service URLs in `render.yaml` with the actual assigned domains.
+- **Frontend — Vercel**: project root directory `frontend/` (Vite auto-detected). [`frontend/vercel.json`](frontend/vercel.json) rewrites all routes to `index.html` for React Router deep links. All five `VITE_*_SERVICE` env vars must be set to the backend URLs — they are baked in at build time.
+- **MongoDB Atlas** (M0): network access must allow `0.0.0.0/0` — Render's free tier has no static egress IPs.
+- **CloudAMQP** (Lemur): managed RabbitMQ; the `amqps://` URL goes into `RABBITMQ_URL`. Shop and rider auto-reconnect and re-register their consumers when idle connections are dropped.
+- **Google OAuth**: the frontend uses popup (`postmessage`) mode, so only the Vercel domain needs to be in the OAuth client's *Authorized JavaScript origins* — no redirect URI.
+
+### Free-tier limitations
+
+- All five services sleep independently after 15 min idle; a cold full user journey may need several ~50s warmups. Each service exposes `GET /` as a health/warmup endpoint.
+- Atlas M0 caps storage at 512 MB; CloudAMQP Lemur caps messages/connections.
+- Known legacy quirk: `PaymentSuccess.jsx` references an unused `stripe-verify` route — actual payment verification happens in `Checkout.jsx` via `/api/payment/verify`.
 
 ## Project Structure
 

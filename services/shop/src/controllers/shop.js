@@ -6,6 +6,45 @@ import getBuffer from "../config/datauri.js";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 
+// Posts a data URI to the utils service and returns { url } or { error }.
+// Without this the upstream failure surfaced as a bare "Request failed with
+// status code 500", hiding whether it was Cloudinary, the internal key, or a
+// cold-started utils instance that actually broke.
+const uploadImage = async (dataUri) => {
+    if (!process.env.UTILS_SERVICE) {
+        return { error: "UTILS_SERVICE is not configured on this service" };
+    }
+
+    try {
+        const { data } = await axios.post(
+            `${process.env.UTILS_SERVICE}/api/upload`,
+            { buffer: dataUri },
+            {
+                headers: { "x-internal-key": process.env.INTERNAL_SERVICE_KEY },
+                // Render free instances sleep; a cold start takes ~50s. Without
+                // a timeout a dead utils service hangs the request indefinitely.
+                timeout: 90000,
+            }
+        );
+
+        if (!data?.url) {
+            return { error: "image upload returned no url" };
+        }
+
+        return { url: data.url };
+
+    } catch (error) {
+        const detail =
+            error.response?.data?.error ||
+            error.response?.data?.message ||
+            error.message;
+
+        console.error("Image upload failed:", error.response?.status || "", detail);
+
+        return { error: `image upload failed: ${detail}` };
+    }
+};
+
 export const addshop = asyncHandler(async (req,res) => {
 
     const user = req.user;
@@ -46,11 +85,11 @@ export const addshop = asyncHandler(async (req,res) => {
         return res.status(500).json({message:"failed to process image"});
     }
 
-    const { data: uploadResult } = await axios.post(
-        `${process.env.UTILS_SERVICE}/api/upload`,
-        { buffer:fileBuffer.content },
-        { headers: { "x-internal-key": process.env.INTERNAL_SERVICE_KEY } }
-    );
+    const uploadResult = await uploadImage(fileBuffer.content);
+
+    if (uploadResult.error) {
+        return res.status(502).json({ message: uploadResult.error });
+    }
 
     const newShop = await shopModel.create({
         name,
@@ -126,14 +165,17 @@ export const editShop = asyncHandler(async (req, res) => {
     const file = req.file;
     if (file) {
         const fileBuffer = getBuffer(file);
-        if (fileBuffer?.content) {
-            const { data: uploadResult } = await axios.post(
-                `${process.env.UTILS_SERVICE}/api/upload`,
-                { buffer: fileBuffer.content },
-                { headers: { "x-internal-key": process.env.INTERNAL_SERVICE_KEY } }
-            );
-            shop.image = uploadResult.url;
+        if (!fileBuffer?.content) {
+            return res.status(500).json({ message: "failed to process image" });
         }
+
+        const uploadResult = await uploadImage(fileBuffer.content);
+
+        if (uploadResult.error) {
+            return res.status(502).json({ message: uploadResult.error });
+        }
+
+        shop.image = uploadResult.url;
     }
 
     await shop.save();

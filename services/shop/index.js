@@ -39,6 +39,18 @@ app.use("/api/address", addressRouter);
 
 app.use("/api/order", orderRouter);
 
+// Multer rejects an unexpected file field by calling next(err), which without
+// this handler falls through to Express's default and returns an opaque 500.
+app.use((err, req, res, next) => {
+    console.error(`${req.method} ${req.originalUrl} error:`, err);
+
+    if (err.name === "MulterError") {
+        return res.status(400).json({ message: `upload error: ${err.message}` });
+    }
+
+    res.status(500).json({ message: err.message || "internal server error" });
+});
+
 // Bind the port first so the host's health check passes, then connect
 // to external services (mongoose buffers queries until connected).
 app.listen(PORT, () => {

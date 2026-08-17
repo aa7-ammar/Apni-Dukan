@@ -24,7 +24,11 @@ export const isAuth = async (req, res, next) => {
         next();
 
     } catch (error) {
-        return res.status(500).json({ message: "Please login - JWT error" });
+        return res.status(401).json({
+            message: error.name === "TokenExpiredError"
+                ? "Session expired, please login again"
+                : "Invalid token, please login again",
+        });
     }
 };
 

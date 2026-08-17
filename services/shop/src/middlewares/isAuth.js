@@ -24,7 +24,13 @@ export const isAuth = async (req, res, next) => {
         next();
 
     } catch (error) {
-        return res.status(500).json({ message: "Please login - JWT error" });
+        // An expired or malformed token is the client's problem, not a server
+        // fault — 500 here hid every logged-out user behind a generic error.
+        return res.status(401).json({
+            message: error.name === "TokenExpiredError"
+                ? "Session expired, please login again"
+                : "Invalid token, please login again",
+        });
     }
 };
 

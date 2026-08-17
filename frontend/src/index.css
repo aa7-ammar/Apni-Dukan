@@ -1,2 +1,16 @@
 @import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
+
+/* Semantic colour tokens used by SelectRole and Account. Tailwind v4 only
+   generates bg-card, text-primary, border-border, etc. if the matching
+   --color-* token exists; without these the classes compile to nothing.
+   Values follow the dark palette Home.jsx uses. */
+@theme {
+  --color-background: #0a0a0a;
+  --color-card: #141414;
+  --color-border: #1f1f1f;
+  --color-muted: #1a1a1a;
+  --color-muted-foreground: #a0a0a0;
+  --color-primary: #d4af37;
+  --color-secondary: #ededed;
+}

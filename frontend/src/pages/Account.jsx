@@ -1,4 +1,3 @@
-import React from "react"
 import { useAppData } from "../context/AppContext"
 import { useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
@@ -33,7 +32,7 @@ const Account = () => {
               className='h-14 w-14 rounded-full object-cover'
             />
           ) : (
-            <div className='flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-semibold text-white'>
+            <div className='flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-semibold text-background'>
               {firstLetter}
             </div>
           )}
@@ -59,29 +58,32 @@ const Account = () => {
 
       <div className='mx-auto mt-4 max-w-md divide-y divide-border rounded-xl bg-card border border-border shadow-sm'>
 
-        <div
+        <button
+          type='button'
           onClick={() => navigate("/orders")}
-          className='flex cursor-pointer items-center gap-4 p-5 hover:bg-muted transition-colors'
+          className='flex w-full cursor-pointer items-center gap-4 p-5 text-left hover:bg-muted transition-colors'
         >
           <BiPackage className='h-5 w-5 text-primary' />
           <span className='font-medium text-secondary'>Your Orders</span>
-        </div>
+        </button>
 
-        <div
+        <button
+          type='button'
           onClick={() => navigate("/address")}
-          className='flex cursor-pointer items-center gap-4 p-5 hover:bg-muted transition-colors'
+          className='flex w-full cursor-pointer items-center gap-4 p-5 text-left hover:bg-muted transition-colors'
         >
           <BiMapPin className='h-5 w-5 text-primary' />
           <span className='font-medium text-secondary'>Addresses</span>
-        </div>
+        </button>
 
-        <div
+        <button
+          type='button'
           onClick={logoutHandler}
-          className='flex cursor-pointer items-center gap-4 p-5 hover:bg-muted transition-colors'
+          className='flex w-full cursor-pointer items-center gap-4 p-5 text-left hover:bg-muted transition-colors'
         >
           <BiLogOut className='h-5 w-5 text-primary' />
           <span className='font-medium text-primary'>Logout</span>
-        </div>
+        </button>
 
       </div>
 

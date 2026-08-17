@@ -12,11 +12,18 @@ const ProtectedRoute = () => {
         return <Navigate to="/login" replace />
     }
 
-    if (user?.role === null && location.pathname !== "/select-role") {
+    if (!user) return null
+
+    // Treat any falsy role as "not chosen yet", matching Login.jsx and Home.jsx.
+    // Checking === null here instead would bounce a user whose role is undefined
+    // straight back to "/", which then sends them here again — a redirect loop.
+    const hasRole = Boolean(user.role)
+
+    if (!hasRole && location.pathname !== "/select-role") {
         return <Navigate to="/select-role" replace />
     }
 
-    if (user?.role !== null && location.pathname === "/select-role") {
+    if (hasRole && location.pathname === "/select-role") {
         return <Navigate to="/" replace />
     }
 

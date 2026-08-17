@@ -200,7 +200,10 @@ VITE_SHOP_SERVICE=http://localhost:5001
 VITE_REALTIME_SERVICE=http://localhost:5002
 VITE_UTILS_SERVICE=http://localhost:5003
 VITE_RIDER_SERVICE=http://localhost:5005
+VITE_GOOGLE_CLIENT_ID=...apps.googleusercontent.com
 ```
+
+`VITE_GOOGLE_CLIENT_ID` must be the same OAuth client as the auth service's `GOOGLE_CLIENT_ID` — the auth code is minted by the frontend's client and redeemed with the backend's, so a mismatch fails the token exchange.
 </details>
 
 ### 3. Run
@@ -225,7 +228,7 @@ cd frontend && npm run dev                  # http://localhost:5173
 The live demo runs entirely on free tiers:
 
 - **Backend — Render Blueprint**: [`render.yaml`](render.yaml) defines all five services (Node runtime, `npm ci` + `npm start`, `rootDir` per service) plus a shared env group. Deploy via *New → Blueprint*; fill in the prompted secrets, then set `MONGO_URL` and `RABBITMQ_URL` on the env group in the dashboard (group-level `sync: false` values aren't prompted). Render injects `PORT` automatically. After the first deploy, align the inter-service URLs in `render.yaml` with the actual assigned domains.
-- **Frontend — Vercel**: project root directory `frontend/` (Vite auto-detected). [`frontend/vercel.json`](frontend/vercel.json) rewrites all routes to `index.html` for React Router deep links. All five `VITE_*_SERVICE` env vars must be set to the backend URLs — they are baked in at build time.
+- **Frontend — Vercel**: project root directory `frontend/` (Vite auto-detected). [`frontend/vercel.json`](frontend/vercel.json) rewrites all routes to `index.html` for React Router deep links. All five `VITE_*_SERVICE` env vars plus `VITE_GOOGLE_CLIENT_ID` must be set to the production values — they are baked in at build time, so changing one requires a redeploy.
 - **MongoDB Atlas** (M0): network access must allow `0.0.0.0/0` — Render's free tier has no static egress IPs.
 - **CloudAMQP** (Lemur): managed RabbitMQ; the `amqps://` URL goes into `RABBITMQ_URL`. Shop and rider auto-reconnect and re-register their consumers when idle connections are dropped.
 - **Google OAuth**: the frontend uses popup (`postmessage`) mode, so only the Vercel domain needs to be in the OAuth client's *Authorized JavaScript origins* — no redirect URI.
